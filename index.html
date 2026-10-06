@@ -100,6 +100,19 @@ let logoSrc=LOGO,criteria=[],students=[],nextId=0;
 const defaults=[['Practical Work',4],['Lesson Participation',2],['Task Completion',2],['Creativity',1],['Following Instructions',1]];
 function safeGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function safeSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
+// Track visits on this browser only, using the requested localStorage key "user".
+(function recordVisit(){
+  try {
+    let data;
+    try { data=JSON.parse(safeGet('user')||'null'); } catch(e) { data=null; }
+    if (!data || typeof data!=='object' || Array.isArray(data)) data={};
+    const now=new Date().toISOString();
+    if (!data.firstVisit) data.firstVisit=now;
+    data.visitCount=(Number.isFinite(Number(data.visitCount))?Math.max(0,Number(data.visitCount)):0)+1;
+    data.lastVisit=now;
+    safeSet('user',JSON.stringify(data));
+  } catch(e) { /* Storage may be blocked; grading remains usable. */ }
+})();
 for(let i=1;i<=12;i++)$('grade').add(new Option('Grade '+i,i));
 $('date').value=new Date().toLocaleDateString('en-CA');
 function showLogo(){if(logoSrc){$('brand').src=logoSrc;$('brand').hidden=false;$('brandTxt').hidden=true}else{$('brand').hidden=true;$('brandTxt').hidden=false}}
